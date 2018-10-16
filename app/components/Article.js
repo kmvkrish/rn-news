@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { View, Linking, TouchableNativeFeedback, StyleSheet } from 'react-native';
+import { Platform, View, Linking, TouchableNativeFeedback, StyleSheet, ToastAndroid } from 'react-native';
 import { Text, Button, Card, Divider } from 'react-native-elements';
 import moment from 'moment';
 
@@ -10,9 +10,15 @@ export default class Article extends Component {
     }
 
     checkAndOpenUrl = (url) => {
-        if (Linking.canOpenURL(url)) {
-            Linking.openURL(url);
-        }
+        Linking.canOpenURL(url).then((status) => {
+            if (status) {
+                Linking.openURL(url);
+            }
+        }).catch(error => {
+            if (Platform.OS == "android") {
+                ToastAndroid.show("Could not open URL", ToastAndroid.SHORT);
+            }
+        });
     }
 
     render() {
