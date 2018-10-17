@@ -9,6 +9,10 @@ export default class Article extends Component {
         super(props);
     }
 
+    navigate = () => {
+        this.props.handleClick(this.props.article);
+    }
+
     checkAndOpenUrl = (url) => {
         Linking.canOpenURL(url).then((status) => {
             if (status) {
@@ -37,7 +41,7 @@ export default class Article extends Component {
         const { noteStyle, featuredTitleStyle, textStyle, dividerStyle } = styles;
 
         return (
-            <TouchableNativeFeedback useForeground onPress={() => this.checkAndOpenUrl(url)}>
+            <TouchableNativeFeedback useForeground onPress={() => this.navigate()}>
                 <Card
                     image={{uri: urlToImage}}
                     title={title}
@@ -54,7 +58,6 @@ export default class Article extends Component {
                 </Card>
             </TouchableNativeFeedback>
         )
-
     }
 }
 
