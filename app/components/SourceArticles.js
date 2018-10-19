@@ -12,6 +12,9 @@ export default class SourceArticles extends Component {
             loading: true,
             articles: []
         };
+
+        this._isComponentMounted = false;
+
         this.newsapi = new NewsAPI();
     }
 
@@ -35,25 +38,30 @@ export default class SourceArticles extends Component {
     }
 
     async componentDidMount() {
-      const source = this.props.navigation.getParam('source');
-      try {
-          const articles = await this.newsapi.getArticlesForSource(source.id);
-          this.setState({
-              loading: false,
-              articles: articles.articles
-          });
-      } catch( error ) {
-          this.setState({
-              loading: false,
-              articles: []
-          });
-          Alert.alert('Error', 'Could not fetch articles', [{
-            text: 'OK',
-            onPress: () => console.log(`Could not fetch articles for source ${source.name}`)
-          }], {
-              cancelable: false
-          });
-      }
+        this._isComponentMounted = true;
+        const source = this.props.navigation.getParam('source');
+        try {
+            const articles = await this.newsapi.getArticlesForSource(source.id);
+            if (this._isComponentMounted) {
+                this.setState({
+                    loading: false,
+                    articles: articles.articles
+                });
+            }
+        } catch( error ) {
+            if (this._isComponentMounted) {
+                this.setState({
+                    loading: false,
+                    articles: []
+                });
+            }
+            Alert.alert('Error', 'Could not fetch articles', [{
+                text: 'OK',
+                onPress: () => console.log(`Could not fetch articles for source ${source.name}`)
+            }], {
+                cancelable: false
+            });
+        }
     }
 
     render() {
@@ -76,6 +84,10 @@ export default class SourceArticles extends Component {
                 </View>
             );
         }
+    }
+
+    componentWillUnmount() {
+        this._isComponentMounted = false;
     }
 }
 

@@ -13,6 +13,7 @@ export default class HomeScreen extends Component {
         loading: true,
         articles: []
         };
+        this._isComponentMounted = false;
         this.newsApi = new NewsAPI();
     }
 
@@ -36,15 +37,19 @@ export default class HomeScreen extends Component {
     async componentDidMount() {
         try {
             const headlines = await this.newsApi.getTopHeadlines();
-            this.setState({
-                loading: false,
-                articles: headlines.articles
-            });
+            if (this._isComponentMounted) {
+                this.setState({
+                    loading: false,
+                    articles: headlines.articles
+                });
+            }
         } catch (err) {
-            this.setState({
-                loading: false,
-                article: []
-            });
+            if (this._isComponentMounted) {
+                this.setState({
+                    loading: false,
+                    article: []
+                });
+            }
             if (Platform.OS === "android") {
                 ToastAndroid.show("Failed to get headlines", ToastAndroid.SHORT);
             }
@@ -71,6 +76,10 @@ export default class HomeScreen extends Component {
                 </View>
             )
         }
+    }
+
+    componentWillUnmount() {
+        this._isComponentMounted = false;
     }
 }
 
